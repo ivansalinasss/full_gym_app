@@ -20,7 +20,6 @@ import PropTypes from "prop-types";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import Icon from "@mui/material/Icon";
-import Divider from "@mui/material/Divider";
 import Fade from "@mui/material/Fade";
 
 // Material Dashboard 2 React components
@@ -33,26 +32,18 @@ import MDSnackbarIconRoot from "components/MDSnackbar/MDSnackbarIconRoot";
 // Material Dashboard 2 React context
 import { useMaterialUIController } from "context";
 
-function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...rest }) {
+function MDSnackbar({ color, icon, title, close, bgWhite, ...rest }) {
   const [controller] = useMaterialUIController();
   const { darkMode } = controller;
 
   let titleColor;
-  let dateTimeColor;
-  let dividerColor;
 
   if (bgWhite) {
     titleColor = color;
-    dateTimeColor = "dark";
-    dividerColor = false;
   } else if (color === "light") {
     titleColor = darkMode ? "inherit" : "dark";
-    dateTimeColor = darkMode ? "inherit" : "text";
-    dividerColor = false;
   } else {
     titleColor = "white";
-    dateTimeColor = "white";
-    dividerColor = true;
   }
 
   return (
@@ -61,7 +52,7 @@ function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...
       autoHideDuration={5000}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "right",
+        horizontal: "center",
       }}
       {...rest}
       action={
@@ -104,9 +95,6 @@ function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...
             </MDTypography>
           </MDBox>
           <MDBox display="flex" alignItems="center" lineHeight={0}>
-            <MDTypography variant="caption" color={dateTimeColor}>
-              {dateTime}
-            </MDTypography>
             <Icon
               sx={{
                 color: ({ palette: { dark, white } }) =>
@@ -122,24 +110,6 @@ function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...
             </Icon>
           </MDBox>
         </MDBox>
-        <Divider sx={{ margin: 0 }} light={dividerColor} />
-        <MDBox
-          p={1.5}
-          sx={{
-            fontSize: ({ typography: { size } }) => size.sm,
-            color: ({ palette: { white, text } }) => {
-              let colorValue = bgWhite || color === "light" ? text.main : white.main;
-
-              if (darkMode) {
-                colorValue = color === "light" ? "inherit" : white.main;
-              }
-
-              return colorValue;
-            },
-          }}
-        >
-          {content}
-        </MDBox>
       </MDBox>
     </Snackbar>
   );
@@ -149,6 +119,7 @@ function MDSnackbar({ color, icon, title, dateTime, content, close, bgWhite, ...
 MDSnackbar.defaultProps = {
   bgWhite: false,
   color: "info",
+  title: "mensaje",
 };
 
 // Typechecking props for MDSnackbar
@@ -164,9 +135,7 @@ MDSnackbar.propTypes = {
     "light",
   ]),
   icon: PropTypes.node.isRequired,
-  title: PropTypes.string.isRequired,
-  dateTime: PropTypes.string.isRequired,
-  content: PropTypes.node.isRequired,
+  title: PropTypes.string,
   close: PropTypes.func.isRequired,
   bgWhite: PropTypes.bool,
 };
