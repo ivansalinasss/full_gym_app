@@ -30,7 +30,7 @@ function Dashboard() {
                 </MDTypography>
               </MDBox>
               <MDBox p={2}>
-                <MDTypography variant="h6">Hola 😎</MDTypography>
+                <MDTypography variant="h6">Hola</MDTypography>
               </MDBox>
             </Card>
           </Grid>

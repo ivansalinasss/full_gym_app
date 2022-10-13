@@ -6,6 +6,21 @@ const httpClient = Axios.create({
 
 export default httpClient;
 
+export function setBaseURLToKeycloakServer() {
+  if (
+    httpClient.defaults.baseURL !==
+    `${process.env.REACT_APP_AUTH_SERVER_URL}admin/realms/${process.env.REACT_APP_REALM}/`
+  ) {
+    httpClient.defaults.baseURL = `${process.env.REACT_APP_AUTH_SERVER_URL}admin/realms/${process.env.REACT_APP_REALM}/`;
+  }
+}
+
+export function setBaseURLToAPIServer() {
+  if (httpClient.defaults.baseURL !== process.env.REACT_APP_API_URL) {
+    httpClient.defaults.baseURL = process.env.REACT_APP_API_URL;
+  }
+}
+
 export function getAccessToken() {
   return sessionStorage.getItem("token");
 }
@@ -32,6 +47,7 @@ httpClient.interceptors.response.use(
 );
 
 export function APIGet(endpoint, body, onSuccess, onError) {
+  setBaseURLToAPIServer();
   httpClient
     .get(endpoint, body)
     .then((response) => {
@@ -43,8 +59,21 @@ export function APIGet(endpoint, body, onSuccess, onError) {
 }
 
 export function APIPost(endpoint, body, onSuccess, onError) {
+  setBaseURLToAPIServer();
   httpClient
     .post(endpoint, body)
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    });
+}
+
+export function keycloakServerGet(endpoint, body, onSuccess, onError) {
+  setBaseURLToKeycloakServer();
+  httpClient
+    .get(endpoint, body)
     .then((response) => {
       onSuccess(response);
     })
