@@ -8,7 +8,7 @@ import MDButton from "components/MDButton";
 import { useEffect, useState } from "react";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
-import { keycloakServerGet, keycloakServerPost } from "services/CallApi";
+import { keycloakServerGet, keycloakServerPost, keycloakServerPut } from "services/CallApi";
 
 function User({ username, handleClose, setAlert, mode }) {
   const [disabledSubmit, setDisableSubmit] = useState(true);
@@ -21,7 +21,8 @@ function User({ username, handleClose, setAlert, mode }) {
   const [submitText, setSubmitText] = useState("Crear");
 
   useEffect(() => {
-    if (mode === "update") {
+    setDisableSubmit(true);
+    if (mode === "edit") {
       setSubmitText("Modificar");
       keycloakServerGet(
         `users?username=${username}`,
@@ -47,7 +48,7 @@ function User({ username, handleClose, setAlert, mode }) {
         enabled: true,
       });
     }
-  }, [mode]);
+  }, [mode, username]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -60,6 +61,27 @@ function User({ username, handleClose, setAlert, mode }) {
             open: true,
             color: "success",
             message: `Usuario creado correctamente`,
+          });
+        },
+        (err) => {
+          console.log(err);
+          setAlert({
+            open: true,
+            color: "error",
+            message: err.response.data.errorMessage,
+          });
+        }
+      );
+    } else if (mode === "edit") {
+      console.log(user);
+      keycloakServerPut(
+        `users/${user.id}`,
+        user,
+        () => {
+          handleClose({
+            open: true,
+            color: "success",
+            message: `Usuario ${user.username} modificado correctamente`,
           });
         },
         (err) => {
@@ -89,6 +111,7 @@ function User({ username, handleClose, setAlert, mode }) {
           value={user.username}
           onChange={handleChange}
           margin="dense"
+          disabled={mode === "edit"}
         />
         <MDInput
           label="Nombre/s"

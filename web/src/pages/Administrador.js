@@ -35,6 +35,11 @@ function Administrador() {
     setOpenModalUserView(true);
   };
 
+  const onClickEditUser = (username) => {
+    setSelectedUser(username);
+    setModalUser("edit");
+  };
+
   const getUsers = () => {
     keycloakServerGet(
       "users",
@@ -49,12 +54,19 @@ function Administrador() {
                 done
               </Icon>
             ) : (
-              <Icon sx={{ color: "Gray" }}>toggle_off</Icon>
+              <Icon sx={{ color: "Gray" }} fontSize="medium">
+                close
+              </Icon>
             ),
             actions: (
-              <MDButton variant="text" iconOnly onClick={() => onClickUserView(user.username)}>
-                <Icon sx={{ color: "Gray" }}>visibility</Icon>
-              </MDButton>
+              <>
+                <MDButton variant="text" iconOnly onClick={() => onClickUserView(user.username)}>
+                  <Icon sx={{ color: "Gray" }}>visibility</Icon>
+                </MDButton>
+                <MDButton variant="text" iconOnly onClick={() => onClickEditUser(user.username)}>
+                  <Icon sx={{ color: "Gray" }}>edit</Icon>
+                </MDButton>
+              </>
             ),
           }))
         );
