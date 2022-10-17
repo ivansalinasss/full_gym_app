@@ -13,6 +13,7 @@ import Icon from "@mui/material/Icon";
 import { keycloakServerGet } from "services/CallApi";
 import React, { useState, useEffect } from "react";
 import UserView from "./UserView";
+import User from "./User";
 
 function Administrador() {
   const [users, setUsers] = useState([]);
@@ -22,10 +23,11 @@ function Administrador() {
   const columns = [
     { Header: "Usuario", accessor: "user" },
     { Header: "Nombre", accessor: "nombreCompleto", width: "max-content" },
-    { Header: "Enabled", accessor: "enabled" },
-    { Header: "acciones", accessor: "actions" },
+    { Header: "Enabled", accessor: "enabled", align: "center" },
+    { Header: "acciones", accessor: "actions", align: "center" },
   ];
   const [openModalUserView, setOpenModalUserView] = useState(false);
+  const [modalUser, setModalUser] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
 
   const onClickUserView = (username) => {
@@ -68,6 +70,15 @@ function Administrador() {
     );
   };
 
+  const handleCloseUser = (a = {}) => {
+    setModalUser("");
+    if (a !== {}) {
+      setAlert(a);
+      // Refrescamos la grilla al editar o modificar usuario
+      getUsers();
+    }
+  };
+
   useEffect(() => {
     getUsers();
   }, []);
@@ -80,6 +91,18 @@ function Administrador() {
         handleClose={() => setOpenModalUserView(false)}
       >
         <UserView username={selectedUser} setAlert={setAlert} />
+      </Modal>
+      <Modal
+        title={modalUser === "add" ? "Crear Nuevo Usuario" : "Editar Usuario"}
+        open={modalUser !== ""}
+        handleClose={() => setModalUser("")}
+      >
+        <User
+          username={selectedUser}
+          setAlert={setAlert}
+          mode={modalUser}
+          handleClose={handleCloseUser}
+        />
       </Modal>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
@@ -102,7 +125,12 @@ function Administrador() {
                 <MDTypography variant="h6" color="white">
                   Usuarios
                 </MDTypography>
-                <MDButton color="success" variant="gradient" size="large">
+                <MDButton
+                  color="success"
+                  variant="gradient"
+                  size="large"
+                  onClick={() => setModalUser("add")}
+                >
                   <Icon>add</Icon>&nbsp; Crear nuevo
                 </MDButton>
               </MDBox>

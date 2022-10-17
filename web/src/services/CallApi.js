@@ -85,3 +85,27 @@ export function keycloakServerGet(endpoint, body, onSuccess, onError) {
       onError(error);
     });
 }
+
+export function keycloakServerPost(endpoint, body, onSuccess, onError) {
+  setBaseURLToKeycloakServer();
+  httpClient
+    .post(endpoint, body)
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    });
+}
+
+export function keycloakServerPut(endpoint, body, onSuccess, onError) {
+  setBaseURLToKeycloakServer();
+  httpClient
+    .put(endpoint, body)
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    });
+}
