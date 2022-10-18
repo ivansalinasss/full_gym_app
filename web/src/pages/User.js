@@ -8,11 +8,11 @@ import MDButton from "components/MDButton";
 import { useEffect, useState } from "react";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
-import { keycloakServerGet, keycloakServerPost, keycloakServerPut } from "services/CallApi";
+import { keycloakServerPost, keycloakServerPut } from "services/CallApi";
 
-function User({ username, handleClose, setAlert, mode }) {
+function User({ user, handleClose, setAlert, mode }) {
   const [disabledSubmit, setDisableSubmit] = useState(true);
-  const [user, setUser] = useState({
+  const [state, setState] = useState({
     username: "",
     firstName: "",
     lastName: "",
@@ -24,38 +24,24 @@ function User({ username, handleClose, setAlert, mode }) {
     setDisableSubmit(true);
     if (mode === "edit") {
       setSubmitText("Modificar");
-      keycloakServerGet(
-        `users?username=${username}`,
-        null,
-        (response) => {
-          setUser(response.data[0]);
-        },
-        (error) => {
-          setAlert({
-            open: true,
-            message: `No se pudo cargar datos del usuario ${username}(${error.message})`,
-            color: "error",
-          });
-          console.error(error);
-        }
-      );
+      setState(user);
     } else if (mode === "add") {
       setSubmitText("Crear");
-      setUser({
+      setState({
         username: "",
         firstName: "",
         lastName: "",
         enabled: true,
       });
     }
-  }, [mode, username]);
+  }, [mode, user]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (mode === "add") {
       keycloakServerPost(
         "users",
-        user,
+        state,
         () => {
           handleClose({
             open: true,
@@ -64,7 +50,6 @@ function User({ username, handleClose, setAlert, mode }) {
           });
         },
         (err) => {
-          console.log(err);
           setAlert({
             open: true,
             color: "error",
@@ -73,19 +58,17 @@ function User({ username, handleClose, setAlert, mode }) {
         }
       );
     } else if (mode === "edit") {
-      console.log(user);
       keycloakServerPut(
-        `users/${user.id}`,
-        user,
+        `users/${state.id}`,
+        state,
         () => {
           handleClose({
             open: true,
             color: "success",
-            message: `Usuario ${user.username} modificado correctamente`,
+            message: `Usuario ${state.username} modificado correctamente`,
           });
         },
         (err) => {
-          console.log(err);
           setAlert({
             open: true,
             color: "error",
@@ -98,7 +81,7 @@ function User({ username, handleClose, setAlert, mode }) {
 
   const handleChange = (event) => {
     const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setUser({ ...user, [event.target.name]: value });
+    setState({ ...user, [event.target.name]: value });
     if (disabledSubmit) setDisableSubmit(false);
   };
 
@@ -108,7 +91,7 @@ function User({ username, handleClose, setAlert, mode }) {
         <MDInput
           label="Usuario"
           name="username"
-          value={user.username}
+          value={state.username}
           onChange={handleChange}
           margin="dense"
           disabled={mode === "edit"}
@@ -116,19 +99,19 @@ function User({ username, handleClose, setAlert, mode }) {
         <MDInput
           label="Nombre/s"
           name="firstName"
-          value={user.firstName}
+          value={state.firstName}
           onChange={handleChange}
           margin="dense"
         />
         <MDInput
           label="Apellido/s"
           name="lastName"
-          value={user.lastName}
+          value={state.lastName}
           onChange={handleChange}
           margin="dense"
         />
         <MDBox display="flex" alignItems="center">
-          <Switch checked={user.enabled} onChange={handleChange} name="enabled" />
+          <Switch checked={state.enabled} onChange={handleChange} name="enabled" />
           <MDTypography variant="Body 2" color="text">
             Habilitado
           </MDTypography>
@@ -154,7 +137,14 @@ function User({ username, handleClose, setAlert, mode }) {
 }
 
 User.propTypes = {
-  username: PropTypes.string.isRequired,
+  user: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    enabled: PropTypes.bool.isRequired,
+    createdTimestamp: PropTypes.shape().isRequired,
+  }).isRequired,
   handleClose: PropTypes.func.isRequired,
   setAlert: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,

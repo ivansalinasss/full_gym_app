@@ -3,30 +3,8 @@ import PropTypes from "prop-types";
 
 import MDTypography from "components/MDTypography";
 import MDBox from "components/MDBox";
-import { useState, useEffect } from "react";
-import { keycloakServerGet } from "services/CallApi";
 
-function UserView({ username, setAlert }) {
-  const [user, setUser] = useState({});
-
-  useEffect(() => {
-    keycloakServerGet(
-      `users?username=${username}`,
-      null,
-      (response) => {
-        setUser(response.data[0]);
-      },
-      (error) => {
-        setAlert({
-          open: true,
-          message: `No se pudo cargar datos del usuario ${username}(${error.message})`,
-          color: "error",
-        });
-        console.error(error);
-      }
-    );
-  }, [username]);
-
+function UserView({ user }) {
   const parseDate = (miliseconds) => {
     const date = new Date(miliseconds);
     return date.toLocaleString();
@@ -63,8 +41,13 @@ function UserView({ username, setAlert }) {
 }
 
 UserView.propTypes = {
-  username: PropTypes.string.isRequired,
-  setAlert: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    enabled: PropTypes.bool.isRequired,
+    createdTimestamp: PropTypes.shape().isRequired,
+  }).isRequired,
 };
 
 export default UserView;

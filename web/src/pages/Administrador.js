@@ -14,6 +14,7 @@ import { keycloakServerGet } from "services/CallApi";
 import React, { useState, useEffect } from "react";
 import UserView from "./UserView";
 import User from "./User";
+import DeleteUser from "./DeleteUser";
 
 function Administrador() {
   const [users, setUsers] = useState([]);
@@ -27,17 +28,23 @@ function Administrador() {
     { Header: "acciones", accessor: "actions", align: "center" },
   ];
   const [openModalUserView, setOpenModalUserView] = useState(false);
+  const [openModalDeleteUser, setOpenModalDeleteUser] = useState(false);
   const [modalUser, setModalUser] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUser, setSelectedUser] = useState({});
 
-  const onClickUserView = (username) => {
-    setSelectedUser(username);
+  const onClickUserView = (user) => {
+    setSelectedUser(user);
     setOpenModalUserView(true);
   };
 
-  const onClickEditUser = (username) => {
-    setSelectedUser(username);
+  const onClickEditUser = (user) => {
+    setSelectedUser(user);
     setModalUser("edit");
+  };
+
+  const onClickDeleteUser = (user) => {
+    setSelectedUser(user);
+    setOpenModalDeleteUser(true);
   };
 
   const getUsers = () => {
@@ -60,11 +67,14 @@ function Administrador() {
             ),
             actions: (
               <>
-                <MDButton variant="text" iconOnly onClick={() => onClickUserView(user.username)}>
+                <MDButton variant="text" iconOnly onClick={() => onClickUserView(user)}>
                   <Icon sx={{ color: "Gray" }}>visibility</Icon>
                 </MDButton>
-                <MDButton variant="text" iconOnly onClick={() => onClickEditUser(user.username)}>
+                <MDButton variant="text" iconOnly onClick={() => onClickEditUser(user)}>
                   <Icon sx={{ color: "Gray" }}>edit</Icon>
+                </MDButton>
+                <MDButton variant="text" iconOnly onClick={() => onClickDeleteUser(user)}>
+                  <Icon sx={{ color: "Gray" }}>delete</Icon>
                 </MDButton>
               </>
             ),
@@ -91,6 +101,15 @@ function Administrador() {
     }
   };
 
+  const handleCloseDeleteUser = (a = {}) => {
+    setOpenModalDeleteUser(false);
+    if (a !== {}) {
+      setAlert(a);
+      // Refrescamos la grilla al eliminar usuario
+      getUsers();
+    }
+  };
+
   useEffect(() => {
     getUsers();
   }, []);
@@ -102,7 +121,7 @@ function Administrador() {
         open={openModalUserView}
         handleClose={() => setOpenModalUserView(false)}
       >
-        <UserView username={selectedUser} setAlert={setAlert} />
+        <UserView user={selectedUser} setAlert={setAlert} />
       </Modal>
       <Modal
         title={modalUser === "add" ? "Crear Nuevo Usuario" : "Editar Usuario"}
@@ -110,11 +129,18 @@ function Administrador() {
         handleClose={() => setModalUser("")}
       >
         <User
-          username={selectedUser}
+          user={selectedUser}
           setAlert={setAlert}
           mode={modalUser}
           handleClose={handleCloseUser}
         />
+      </Modal>
+      <Modal
+        title="Eliminar Usuario"
+        open={openModalDeleteUser}
+        handleClose={() => setOpenModalDeleteUser(false)}
+      >
+        <DeleteUser user={selectedUser} setAlert={setAlert} handleClose={handleCloseDeleteUser} />
       </Modal>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
@@ -151,8 +177,8 @@ function Administrador() {
                   <DataTable
                     table={{ columns, rows: users }}
                     isSorted={false}
-                    showTotalEntries={false}
                     noEndBorder
+                    canSearch
                   />
                 </MDBox>
               ) : (

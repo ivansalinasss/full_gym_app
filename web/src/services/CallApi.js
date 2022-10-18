@@ -109,3 +109,15 @@ export function keycloakServerPut(endpoint, body, onSuccess, onError) {
       onError(error);
     });
 }
+
+export function keycloakServerDelete(endpoint, body, onSuccess, onError) {
+  setBaseURLToKeycloakServer();
+  httpClient
+    .delete(endpoint, body)
+    .then((response) => {
+      onSuccess(response);
+    })
+    .catch((error) => {
+      onError(error);
+    });
+}
