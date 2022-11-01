@@ -87,7 +87,6 @@ function Administrador() {
           message: `No se pudo cargar los usuarios(${error.message})`,
           color: "error",
         });
-        console.error(error);
       }
     );
   };

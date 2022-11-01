@@ -81,7 +81,7 @@ function User({ user, handleClose, setAlert, mode }) {
 
   const handleChange = (event) => {
     const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setState({ ...user, [event.target.name]: value });
+    setState({ ...state, [event.target.name]: value });
     if (disabledSubmit) setDisableSubmit(false);
   };
 
