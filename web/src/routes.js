@@ -1,6 +1,7 @@
 import Icon from "@mui/material/Icon";
 import Dashboard from "pages/Dashboard";
-import Administrador from "pages/Administrador";
+import Users from "pages/Users";
+import Roles from "pages/Roles";
 
 const routes = [
   {
@@ -12,12 +13,25 @@ const routes = [
     component: <Dashboard />,
   },
   {
-    type: "collapse",
-    name: "Administrador",
+    type: "title",
+    title: "Administrador",
     key: "administrador",
-    icon: <Icon fontSize="small">admin_panel_settings</Icon>,
-    route: "/administrador",
-    component: <Administrador />,
+  },
+  {
+    type: "collapse",
+    name: "Usuarios",
+    key: "usuarios",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/administrador/usuarios",
+    component: <Users />,
+  },
+  {
+    type: "collapse",
+    name: "Roles",
+    key: "roles",
+    icon: <Icon fontSize="small">manage_accounts</Icon>,
+    route: "/administrador/roles",
+    component: <Roles />,
   },
 ];
 
